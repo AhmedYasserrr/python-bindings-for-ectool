@@ -14,16 +14,10 @@ class EctoolHardwareController(HardwareController, ABC):
     ):
         self.ectool = ctypes.CDLL(ectool_lib_path)
         self._initialize_ectool_functions()
-        if no_battery_sensor_mode:
-            self.noBatterySensorMode = True
-            self.populate_non_battery_sensors()
+        self.noBatterySensorMode = no_battery_sensor_mode
 
     def _initialize_ectool_functions(self):
         """Define ctypes function signatures for ectool library."""
-        self.ectool.get_non_battery_sensors.restype = ctypes.c_char_p
-
-        self.ectool.get_sensor_temperature.argtypes = [ctypes.c_int]
-        self.ectool.get_sensor_temperature.restype = ctypes.c_float
 
         self.ectool.set_fan_speed.argtypes = [ctypes.c_int]
         self.ectool.set_fan_speed.restype = None
@@ -34,22 +28,9 @@ class EctoolHardwareController(HardwareController, ABC):
         self.ectool.is_on_ac.restype = ctypes.c_bool
         self.ectool.pause_fan_control.restype = None
 
-    def populate_non_battery_sensors(self):
-        raw_out = self.ectool.get_non_battery_sensors().decode("utf-8")  
-        
-        # Assuming the C function returns space-separated IDs
-        self.nonBatterySensors = list(map(int, raw_out.split())) 
-
     def get_temperature(self):
         if self.noBatterySensorMode:
             max_temp = self.ectool.get_max_non_battery_temperature()
-
-            # Alternative approach: Manually retrieve and sort non-battery sensor temperatures.
-            # Less efficient method than calling get_max_non_battery_temperature().
-
-            # temps = [self.ectool.get_sensor_temperature(sensor) for sensor in self.nonBatterySensors]
-            # sorted([temp for temp in temps if temp > 0], reverse=True)
-            # max_temp = temps[0] if temps else 50
         else:
             max_temp = self.ectool.get_max_temperature()
  
