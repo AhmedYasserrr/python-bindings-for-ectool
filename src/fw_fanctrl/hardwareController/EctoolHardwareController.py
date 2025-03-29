@@ -1,5 +1,6 @@
 from abc import ABC
 import ctypes
+import ctypes.util
 from fw_fanctrl.hardwareController.HardwareController import HardwareController
 
 
@@ -10,8 +11,11 @@ class EctoolHardwareController(HardwareController, ABC):
     def __init__(
         self, 
         no_battery_sensor_mode=False, 
-        ectool_lib_path= "/usr/local/lib/libectool.so"
+        ectool_lib_path= None
     ):
+        if ectool_lib_path is None:
+            ectool_lib_path = ctypes.util.find_library("ectool")
+
         self.ectool = ctypes.CDLL(ectool_lib_path)
         self._initialize_ectool_functions()
         self.noBatterySensorMode = no_battery_sensor_mode
