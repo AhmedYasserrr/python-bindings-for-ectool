@@ -39,11 +39,11 @@ This repo is the first step toward exposing `ectool` (used to control the Framew
 1. Build and install the shared library:
 
    ```bash
-   ./build_libectool.sh
+   sudo ./build_libectool.sh
    ```
 2. Then run:
    ```bash
-   ./install.sh
+   sudo ./install.sh
    ```
 
 ## Next Steps
